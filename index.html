@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CatalogAI — Industrial Product Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-box">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Catalog<span>AI</span></div>
+        <div class="brand-tag">Industrial Product Intelligence</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="server-status">
+        <div class="status-dot" id="serverDot"></div>
+        <span id="serverStatusText">Connecting...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <div class="api-section">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div>
+          <div style="font-size:14px; font-weight:600; color:var(--text-primary); margin-bottom:2px;">Google Gemini API Key</div>
+          <div style="font-size:12px; color:var(--text-muted);">Required to run AI analysis. Your key is never stored.</div>
+        </div>
+        <span class="api-status-badge unverified" id="apiStatusBadge">Not Verified</span>
+      </div>
+      <div class="api-row">
+        <input type="password" class="api-input" id="apiKeyInput" placeholder="Paste your Gemini API key here — AIza..." />
+        <button class="btn btn-primary" id="verifyKeyBtn" onclick="verifyApiKey()">Verify Key</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleKeyVisibility()">Show</button>
+      </div>
+      <div id="apiAlertBox" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="tabs-wrapper">
+      <button class="tab-btn active" onclick="switchTab('excel', this)">Excel Workflow</button>
+      <button class="tab-btn" onclick="switchTab('single', this)">Single Product</button>
+      <button class="tab-btn" onclick="switchTab('howto', this)">How It Works</button>
+    </div>
+
+    <div id="tab-excel" class="tab-content fade-in">
+
+      <div class="card">
+        <div class="card-title">Step 1 — Download Template</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+          Download the Excel template, fill in your product data (even messy or incomplete data works), then upload it below for AI analysis.
+        </p>
+        <button class="btn btn-secondary" onclick="downloadTemplate()">Download Excel Template</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Step 2 — Upload Your Data</div>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls" onchange="handleFileSelect(event)" />
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div class="upload-title">Drop your Excel file here</div>
+          <div class="upload-subtitle">or <span>click to browse</span> — .xlsx / .xls supported</div>
+        </div>
+        <div id="fileSelectedInfo" class="hidden" style="margin-top:12px;"></div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" id="processExcelBtn" onclick="processExcel()" disabled>Run AI Analysis</button>
+        </div>
+      </div>
+
+      <div class="card hidden" id="progressCard">
+        <div class="card-title">Processing — Please Wait</div>
+        <div class="progress-wrapper">
+          <div class="progress-label">
+            <span id="progressLabelText">Initializing...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+          </div>
+        </div>
+        <div class="progress-steps" id="progressSteps">
+          <div class="progress-step" id="pStep1"><div class="step-dot"></div><span>Reading Excel file</span></div>
+          <div class="progress-step" id="pStep2"><div class="step-dot"></div><span>Sending to AI for analysis</span></div>
+          <div class="progress-step" id="pStep3"><div class="step-dot"></div><span>Detecting conflicts and enriching data</span></div>
+          <div class="progress-step" id="pStep4"><div class="step-dot"></div><span>Generating readiness scores</span></div>
+          <div class="progress-step" id="pStep5"><div class="step-dot"></div><span>Preparing results</span></div>
+        </div>
+      </div>
+
+      <div class="hidden" id="excelResultsSection">
+
+        <div class="card fade-in">
+          <div class="card-title">Analysis Summary</div>
+          <div class="stats-row" id="summaryStats"></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-success" onclick="downloadResults()">Download Results Excel</button>
+            <button class="btn btn-secondary" onclick="resetExcel()">New Analysis</button>
+          </div>
+        </div>
+
+        <div class="card fade-in">
+          <div class="card-title">Complete Result Table — All Products, All Fields</div>
+          <div id="mainResultTable"></div>
+        </div>
+
+        <div class="card fade-in">
+          <div class="card-title">Product Detail View</div>
+          <div class="product-nav" id="productNav"></div>
+          <div id="productDetailView"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div id="tab-single" class="tab-content hidden">
+      <div class="card">
+        <div class="card-title">Single Product Analysis</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+          Enter any industrial product details below — even messy, incomplete, or misspelled data. AI will clean, enrich, and verify everything.
+        </p>
+
+        <div class="form-grid">
+          <div class="form-group"><label>Product Name</label><input type="text" class="form-input" id="s_name" placeholder="e.g. moter 5hp siemns" /></div>
+          <div class="form-group"><label>Brand / Manufacturer</label><input type="text" class="form-input" id="s_brand" placeholder="e.g. Siemens, ABB, Kirloskar" /></div>
+          <div class="form-group"><label>Model Number</label><input type="text" class="form-input" id="s_model" placeholder="e.g. 1LA7090-2AA10" /></div>
+          <div class="form-group"><label>Product Type</label><input type="text" class="form-input" id="s_type" placeholder="e.g. Motor, Pump, Valve, Sensor" /></div>
+          <div class="form-group"><label>Power (W)</label><input type="text" class="form-input" id="s_power" placeholder="e.g. 3730" /></div>
+          <div class="form-group"><label>Voltage (V)</label><input type="text" class="form-input" id="s_voltage" placeholder="e.g. 415" /></div>
+          <div class="form-group"><label>Current (A)</label><input type="text" class="form-input" id="s_current" placeholder="e.g. 8.5" /></div>
+          <div class="form-group"><label>Frequency (Hz)</label><input type="text" class="form-input" id="s_freq" placeholder="e.g. 50" /></div>
+          <div class="form-group"><label>RPM</label><input type="text" class="form-input" id="s_rpm" placeholder="e.g. 1450" /></div>
+          <div class="form-group"><label>Efficiency (%)</label><input type="text" class="form-input" id="s_eff" placeholder="e.g. 91.5" /></div>
+          <div class="form-group"><label>IP Rating</label><input type="text" class="form-input" id="s_ip" placeholder="e.g. IP55" /></div>
+          <div class="form-group"><label>Weight (kg)</label><input type="text" class="form-input" id="s_weight" placeholder="e.g. 28" /></div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:18px;">
+          <label>Additional Notes / Extra Specs</label>
+          <textarea class="form-textarea" id="s_notes" placeholder="Any other specifications, e.g. Flow Rate: 18 m3/hr, Head: 15m, Material: Cast Iron ..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="analyzeSingleBtn" onclick="analyzeSingle()">Analyze Product</button>
+        <div id="singleAlertBox" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="hidden" id="singleResultSection">
+        <div class="card fade-in" id="singleResultCard"></div>
+      </div>
+    </div>
+
+    <div id="tab-howto" class="tab-content hidden">
+      <div class="card">
+        <div class="card-title">How CatalogAI Works</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">
+          CatalogAI uses Google Gemini AI to transform raw, incomplete, misspelled industrial product data into commerce-ready, verified records.
+        </p>
+        <div class="steps-grid">
+          <div class="step-card"><div class="step-number">Step 01</div><div class="step-title">Smart Product Detection</div><div class="step-desc">AI automatically identifies the product type — Motor, Pump, Valve, Sensor, Transformer, Solar Panel, and more — even from messy or incomplete data.</div></div>
+          <div class="step-card"><div class="step-number">Step 02</div><div class="step-title">Spelling Correction</div><div class="step-desc">Misspelled brand names, product types, and specifications are automatically corrected. "siemns" becomes "Siemens", "moter" becomes "Motor".</div></div>
+          <div class="step-card"><div class="step-number">Step 03</div><div class="step-title">Missing Field Enrichment</div><div class="step-desc">For each missing field, AI fills in values using industry knowledge, with a confidence percentage and source citation for every enriched value.</div></div>
+          <div class="step-card"><div class="step-number">Step 04</div><div class="step-title">Conflict Detection</div><div class="step-desc">AI checks for data inconsistencies. If Power = 5W but Voltage x Current = 40,000W, a HIGH severity conflict is flagged.</div></div>
+          <div class="step-card"><div class="step-number">Step 05</div><div class="step-title">Cross Verification</div><div class="step-desc">Mathematical checks are run: Power = V x I x PF, RPM vs frequency and poles, weight validation. Each check returns PASS, FAIL, or CANNOT VERIFY.</div></div>
+          <div class="step-card"><div class="step-number">Step 06</div><div class="step-title">Human Check Flagging</div><div class="step-desc">When AI is not confident (below 60%) or finds multiple possible values, the field is flagged with a clear reason so humans know what to verify.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Technology Stack</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+          <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Frontend</div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary);">HTML / CSS / JavaScript</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Vanilla — no frameworks</div>
+          </div>
+          <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Backend</div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary);">Python — Flask</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">REST API server</div>
+          </div>
+          <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:16px;">
+            <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">AI Engine</div>
+            <div style="font-size:14px; font-weight:600; color:var(--text-primary);">Google Gemini</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Multi-model fallback</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+    <!-- ─── CHATBOT ASSISTANT ─────────────────── -->
+ <button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()" title="Ask CatalogAI Assistant">
+    <img id="chatIconOpen" src="robot.png" alt="Robot" />
+    <svg id="chatIconClose" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="white"/>
+    </svg>
+    <div class="chat-badge">Ask AI</div>
+  </button>
+
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div class="chat-header-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <div class="chat-header-info">
+        <div class="chat-header-title">CatalogAI Assistant</div>
+        <div class="chat-header-status">Online — Ready to help</div>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="chat-msg bot">
+        Hi! I'm your CatalogAI Assistant. I can help you with two things:
+        <br><br>
+        - Industrial products (Motors, Pumps, Valves, standards, etc.)
+        <br>
+        - How to use this website
+        <br><br>
+        Ask me anything!
+      </div>
+    </div>
+
+    <div class="chat-suggestions" id="chatSuggestions">
+      <button class="chat-suggestion-btn" onclick="sendSuggestion('How do I upload an Excel file?')">How to upload Excel?</button>
+      <button class="chat-suggestion-btn" onclick="sendSuggestion('What is a Readiness Score?')">What is Readiness Score?</button>
+      <button class="chat-suggestion-btn" onclick="sendSuggestion('Explain IP rating for motors')">Explain IP rating</button>
+    </div>
+
+    <div class="chat-input-area">
+      <input
+        type="text"
+        class="chat-input"
+        id="chatInput"
+        placeholder="Ask about products or the website..."
+        onkeypress="if(event.key==='Enter') sendChatMessage()"
+      />
+      <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    CatalogAI — Built for UniHack 2026 — Powered by Google Gemini AI
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
