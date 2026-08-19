@@ -12,8 +12,12 @@ from openpyxl.utils import get_column_letter
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+
+@app.route('/')
+def home():
+    return app.send_static_file('index.html')
 
 GEMINI_MODELS = [
     "gemini-flash-latest",
@@ -581,6 +585,6 @@ Provide a helpful, friendly response:
         return jsonify({"success": False, "message": str(e)})
 
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
     print("CatalogAI Server Starting...")
-    print("Open: http://localhost:5000")
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=port, debug=False)
