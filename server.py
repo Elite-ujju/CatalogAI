@@ -20,12 +20,14 @@ def home():
     return app.send_static_file('index.html')
 
 GEMINI_MODELS = [
+    "gemini-1.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.5-flash",
     "gemini-flash-latest",
     "gemini-flash-lite-latest",
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
+    "gemini-1.5-pro",
     "gemini-2.5-pro",
-    "gemini-pro-latest",
+    "gemini-pro-latest"
 ]
 
 def get_gemini_response(prompt, api_key):
