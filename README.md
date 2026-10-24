@@ -27,9 +27,9 @@ Product cataloging in logistics and e-commerce is highly manual, error-prone, an
 ---
 
 ## 👥 Team & Credits
-Built for **UniHack 2024**:
+Built for **HYPNEXIS 2026**:
 - **Ujjawal (Leader):** Core Developer (Frontend, Backend Server & AI API Integration)
-- **Teammate - Nila Das (IIT Madras):** Market Research, Problem Statement Analysis & Presentation Design
+- **Teammate - Priyank Jajoria, Manmohan Singh, Nikunj Babal 
 
 ---
 
