@@ -4,26 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CatalogAI — Industrial Product Intelligence</title>
+  <meta name="description" content="CatalogAI turns messy industrial product data into verified, commerce-ready catalog records." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/jpeg" href="catalogai-logo.jpeg" />
 </head>
 <body>
 
   <header class="header">
     <div class="header-left">
       <div class="logo-box">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
+          <img src="catalogai-logo.jpeg" alt="CatalogAI logo" />
       </div>
       <div>
         <div class="brand-name">Catalog<span>AI</span></div>
-        <div class="brand-tag">Industrial Product Intelligence</div>
+        <div class="brand-tag">Industrial product intelligence</div>
       </div>
     </div>
     <div class="header-right">
+      <div class="header-context"><span class="context-dot"></span> Workspace / Demo catalog</div>
       <div class="server-status">
         <div class="status-dot" id="serverDot"></div>
         <span id="serverStatusText">Connecting...</span>
@@ -32,6 +33,30 @@
   </header>
 
   <main class="main-container">
+
+    <section class="hero-panel">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Catalog operations, simplified</div>
+        <h1>Make every product record <span>ready to sell.</span></h1>
+        <p>Clean messy spreadsheets, surface conflicts, and enrich industrial product data with a clear audit trail—before it reaches your store or ERP.</p>
+        <div class="hero-proof-row">
+          <span><b>01</b> Import raw data</span>
+          <span><b>02</b> Verify with AI</span>
+          <span><b>03</b> Export clean catalog</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="hero-art-grid"></div>
+        <div class="hero-art-card hero-art-card-main">
+          <div class="art-card-top"><span class="art-kicker">CATALOG HEALTH</span><span class="art-status">LIVE</span></div>
+          <div class="art-score">92<span>/100</span></div>
+          <div class="art-score-label">Average readiness</div>
+          <div class="art-bars"><span style="width:88%"></span><span style="width:68%"></span><span style="width:94%"></span></div>
+          <div class="art-footer"><span>Verified fields</span><strong>+18.4%</strong></div>
+        </div>
+        <div class="hero-art-card hero-art-card-float"><span class="float-icon">✓</span><div><strong>8 products enriched</strong><small>Audit trail generated</small></div></div>
+      </div>
+    </section>
 
     <div class="api-section">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
